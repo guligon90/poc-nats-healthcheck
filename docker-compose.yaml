@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  nats:
+    container_name: nats-ss-ctnr
+    image: nats-ss-img
+    build:
+      context: ./infra/docker
+      dockerfile: Dockerfile
+    ports:
+      - target: 4222
+        published: 4222
+      - target: 8222
+        published: 8222
+    networks:
+      - nats-ss-default
+
+networks:
+  nats-ss-default:
