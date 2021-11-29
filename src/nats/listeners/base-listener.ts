@@ -43,7 +43,7 @@ abstract class BaseListener<T extends BaseEvent> {
     });
   }
 
-  parseMessage(msg: Message): unknown {
+  parseMessage(msg: Message): T['data'] {
     const data = msg.getData();
 
     return typeof data === 'string'
