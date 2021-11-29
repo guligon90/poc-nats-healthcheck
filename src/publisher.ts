@@ -1,7 +1,7 @@
-import { formatDateTime, secsToHMS } from './common/utils';
+import { secsToHMS } from './common/utils';
 import { NATS_SERVER_SETTINGS } from './common/constants';
-import Subjects from './nats/subjects';
 import { buildStan } from './nats/stan';
+import HealthcheckCreatedPublisher from './nats/publisher/healthcheck-created-publisher';
 
 console.clear();
 
@@ -24,19 +24,21 @@ stan.on('connect', () => {
     console.log(`NATS publisher connection closed!`);
     process.exit(); // Generates SIGTERM
   });
-  
-  setInterval(() => {
-    // A gotcha from NATS is that it does not accept object
-    // payloads in events' messages, only strings.
-    const data = JSON.stringify({
-      pid: process.pid,
-      title: process.title,
-      upTime: secsToHMS(process.uptime()),
-    });
 
-    stan.publish(Subjects.HealthCheckCreated, data, () => {
-      console.log(`Event published at ${formatDateTime(Date())}`);
-    });
+  const publisher = new HealthcheckCreatedPublisher(stan);
+
+  setInterval(async () => {
+    try {
+      const data = {
+        pid: process.pid,
+        title: process.title,
+        upTime: secsToHMS(process.uptime()),
+      };
+  
+      await publisher.publish(data);
+    } catch (error) {
+      console.error(error);
+    }
   }, interval * 1e3);
 });
 
