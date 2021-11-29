@@ -1,7 +1,7 @@
 const NATS_SERVER_SETTINGS = {
   clusterID: 'healthcheck',
   publisher: {
-    interval: 30.0, // seconds,
+    interval: 10.0, // seconds,
     prefix: 'hc-pub',
   },
   subscriber: {
